@@ -45,14 +45,13 @@ export const signup = catchAsyncErrors(async (req, res, next) => {
 
   generateJWTToken(user, "user successfully registered", 201, res);
 });
+
 export const signin = catchAsyncErrors(async (req, res, next) => {
-  console.log("req",req);
-  
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({
       success: false,
-      message: "Please provide emal and password",
+      message: "Please provide email and password",
     });
   }
   const emailRegex = /^\S+@\S+\.\S+$/;
@@ -62,28 +61,39 @@ export const signin = catchAsyncErrors(async (req, res, next) => {
       message: "Invalid email format",
     });
   }
-  const isEmailRegistered = await User.findOne({ email });
-  if (!isEmailRegistered) {
+  const user = await User.findOne({ email });
+  if (!user) {
     return res.status(400).json({
       success: false,
-      message: "User Not Found",
+      message: "Invalid Credentials",
     });
   }
-  if (isEmailRegistered) {
-    const match = await bcrypt.compare(password, isEmailRegistered.password);
-    if (match) {
-      res.status(200).json({
-        success: true,
-        message: "User signed in successfully",
-      });
-    } else {
+  if (user) {
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
       res.status(401).json({
         success: false,
         message: "Please Provide correct credentials",
       });
     }
+
+    generateJWTToken(user, "User signed in successfully", 200, res);
   }
 });
-export const signout = catchAsyncErrors(async (req, res, next) => {});
+
+export const signout = catchAsyncErrors(async (req, res, next) => {
+  res
+    .status(200)
+    .cookie("token", "", {
+      maxAge: 0,
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+    })
+    .json({
+      success: true,
+      message: "User logged out successfully",
+    });
+});
 export const getUser = catchAsyncErrors(async (req, res, next) => {});
 export const updateProfile = catchAsyncErrors(async (req, res, next) => {});

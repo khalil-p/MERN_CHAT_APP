@@ -7,13 +7,14 @@ import {
   signup,
   updateProfile,
 } from "../controllers/user.controller.js";
+import { isAuthenticated } from "../middlewares/isAuthenticated.middleware.js";
 
 const router = express.Router();
 
 router.post("/sign-up", signup);
 router.post("/sign-in", signin);
-router.get("/sign-out", signout);
-router.get("/me", getUser);
-router.put("/update-profile", updateProfile);
+router.get("/sign-out", isAuthenticated, signout);
+router.get("/me", isAuthenticated, getUser);
+router.put("/update-profile", isAuthenticated, updateProfile);
 
 export default router;
