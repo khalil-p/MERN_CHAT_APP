@@ -45,7 +45,45 @@ export const signup = catchAsyncErrors(async (req, res, next) => {
 
   generateJWTToken(user, "user successfully registered", 201, res);
 });
-export const signin = catchAsyncErrors(async (req, res, next) => {});
+export const signin = catchAsyncErrors(async (req, res, next) => {
+  console.log("req",req);
+  
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide emal and password",
+    });
+  }
+  const emailRegex = /^\S+@\S+\.\S+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid email format",
+    });
+  }
+  const isEmailRegistered = await User.findOne({ email });
+  if (!isEmailRegistered) {
+    return res.status(400).json({
+      success: false,
+      message: "User Not Found",
+    });
+  }
+  if (isEmailRegistered) {
+    const match = await bcrypt.compare(password, isEmailRegistered.password);
+    if (match) {
+      res.status(200).json({
+        success: true,
+        message: "User signed in successfully",
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        message: "Please Provide correct credentials",
+      });
+    }
+  }
+});
 export const signout = catchAsyncErrors(async (req, res, next) => {});
 export const getUser = catchAsyncErrors(async (req, res, next) => {});
 export const updateProfile = catchAsyncErrors(async (req, res, next) => {});
