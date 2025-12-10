@@ -2,6 +2,7 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.middleware.js"
 import { User } from "../models/user.model.js";
 import { generateJWTToken } from "../utils/jwtToken.js";
 import bcrypt from "bcryptjs";
+import {v2 as cloudinary} from "cloudinary"
 export const signup = catchAsyncErrors(async (req, res, next) => {
   const { fullName, email, password } = req.body;
   if (!fullName || !email || !password) {
@@ -95,5 +96,35 @@ export const signout = catchAsyncErrors(async (req, res, next) => {
       message: "User logged out successfully",
     });
 });
-export const getUser = catchAsyncErrors(async (req, res, next) => {});
-export const updateProfile = catchAsyncErrors(async (req, res, next) => {});
+export const getUser = catchAsyncErrors(async (req, res, next) => {
+  // const user = await User.findById(req.user._id)
+  const user = req.user;
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
+export const updateProfile = catchAsyncErrors(async (req, res, next) => {
+  const { email, fullName } = req.body;
+  if (email.trim().length === 0 || fullName.trim().length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: "fullName and  email cannot be empty.",
+    });
+  }
+  const avatar  = req?.files?.avatar;
+  const cloudinaryResponse = {}
+  if(avatar){
+    try{
+const oldAvatarPublicId = req.user?.avatar?.public_id
+if(oldAvatarPublicId && oldAvatarPublicId.length > 0){
+  await cloudinary 
+}
+    }catch(error){
+
+    }
+  }
+  const user = await User.findById(req.user._id);
+  if (email) {
+  }
+});
