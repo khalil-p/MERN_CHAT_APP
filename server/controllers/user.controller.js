@@ -113,8 +113,10 @@ export const updateProfile = catchAsyncErrors(async (req, res, next) => {
     });
   }
   const avatar = req?.files?.avatar;
-  const cloudinaryResponse = {};
-  if (avatar) {
+  let cloudinaryResponse = {};
+  console.log({avatar});
+  
+  if (avatar) { 
     try {
       const oldAvatarPublicId = req.user?.avatar?.public_id;
       if (oldAvatarPublicId && oldAvatarPublicId.length > 0) {
