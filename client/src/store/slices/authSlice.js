@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { axiosInstance } from "../../lib/axios";
 import { connect } from "socket.io-client";
-import { connectSocket } from "../../lib/socket";
+import { connectSocket, disconnetSocket } from "../../lib/socket";
+import { toast } from "react-toastify";
 export const getUser = createAsyncThunk("user/me", async (_, thunkAPI) => {
   try {
     const res = await axiosInstance.get("/user/me");
@@ -11,6 +12,17 @@ export const getUser = createAsyncThunk("user/me", async (_, thunkAPI) => {
     return thunkAPI.rejectWithValue(
       error.response?.data || "Failed to fetch user"
     );
+  }
+});
+
+export const logout = createAsyncThunk("user/sign-out", async (_, thunkAPI) => {
+  try {
+    await axiosInstance.get("/user/sign-out");
+    disconnetSocket();
+    return null;
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Failed to log out");
+    return thunkAPI.rejectWithValue(error.response?.data?.message);
   }
 });
 const authSlice = createSlice({
@@ -32,11 +44,17 @@ const authSlice = createSlice({
     builder
       .addCase(getUser.fulfilled, (state, action) => {
         state.authUser = action.payload;
-        state.isCheckingAuth = false;
+        state.isCheckingAuth = true;
       })
-      .addCase(getUser.fulfilled, (state, action) => {
+      .addCase(getUser.rejected, (state, action) => {
         state.authUser = null;
         state.isCheckingAuth = false;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.authUser = null;
+      })
+      .addCase(logout.rejected, (state) => {
+        state.authUser;
       });
   },
 });
