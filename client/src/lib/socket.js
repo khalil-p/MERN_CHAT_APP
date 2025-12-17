@@ -17,7 +17,7 @@ export const getSocket = () => socket;
 
 export const disconnetSocket = () => {
   if (socket) {
-    socket.disconnet();
-    socket - null;
+    socket.disconnect(); // ✅ correct API
+    socket = null;
   }
 };

@@ -12,7 +12,7 @@ function Navbar() {
   };
 
   return (
-    <div>
+    <div className="border-b border-b-gray-200 ">
       <header className="fixed top-0 w-full z-40 bg-white/80 backdrop:backdrop-blur-lg border border-gray-200 shadow-sm"></header>
       <div className="max-w-7xl mx-auto px-4 h-16">
         <div className="flex items=center justify-between h-full">

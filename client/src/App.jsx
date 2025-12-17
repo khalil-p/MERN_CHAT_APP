@@ -4,6 +4,7 @@ import { Loader } from "lucide-react";
 import { useEffect } from "react";
 import { getUser, setOnlineUsers } from "./store/slices/authSlice";
 import { connectSocket, disconnetSocket } from "./lib/socket";
+import { ToastContainer } from "react-toastify";
 import {
   BrowserRouter as Router,
   Route,
@@ -16,29 +17,38 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 function App() {
-  const { authUser, isCheckingAuth } = useSelector((state) => state.auth);
+  const { authUser, isCheckingAuth, isLogginIn, isLoggedIn } = useSelector(
+    (state) => state.auth
+  );
+  console.log({ isLogginIn });
+
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getUser);
+    // if (!isLoggedIn) return;
+    console.log("getsr");
+
+    dispatch(getUser());
   }, [getUser]);
 
   useEffect(() => {
-    if (authUser) {
-      const socket = connectSocket(authUser._id);
+    if (!authUser) return;
 
-      socket.on("getOnlineUsers", (users) => {
-        dispatch(setOnlineUsers(users));
-      });
-    }
+    const socket = connectSocket(authUser._id);
+
+    socket.on("getOnlineUsers", (users) => {
+      dispatch(setOnlineUsers(users));
+    });
 
     return () => disconnetSocket();
-  }, [authUser]);
+  }, [authUser, dispatch]);
 
   if (isCheckingAuth && !authUser) {
     <div className="flex justify-center items-center">
       <Loader className="size-10 animate-spin" />
     </div>;
   }
+  console.log({ authUser });
+
   return (
     <>
       <Router>
@@ -62,6 +72,7 @@ function App() {
           />
         </Routes>
       </Router>
+      <ToastContainer />
     </>
   );
 }

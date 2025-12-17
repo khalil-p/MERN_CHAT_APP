@@ -1,9 +1,12 @@
-import { Eye, EyeOff, Loader2, Mail, MessageSquare } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import AuthImagePattern from "../Components/AuthImagePattern";
+import { login } from "../store/slices/authSlice";
 
 function Login() {
-  const [showPassword, setShowPassword] = useState();
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -13,11 +16,14 @@ function Login() {
   const dispatch = useDispatch();
   const handleSubmit = (e) => {
     e.preventDefault();
-    // dispatch(Login(formData));
+    dispatch(login(formData));
   };
-  useState(() => {}, []);
+  // useState(() => {}, []);
+  const inputCss =
+    "bg-white w-full border border-gray-300 rounded-md py-2 pl-10 px-3 focus:outline-none focus:ring-2 focus:ring-blue-200 [&:-webkit-autofill]:bg-white [&:-webkit-autofill]:shadow-[inset_0_0_0_1000px_white] [&:-webkit-autofill]:text-black";
+
   return (
-    <div className="min-h-screen grid grod-cols-1 lg:grid-cols-2 bg-white">
+    <div className=" grid grod-cols-1 lg:grid-cols-2 bg-white">
       {/* {LEFT SIDE - FORM} */}
       <div className="flex flex-col justify-center items-center px-5 py-12">
         <div className="w-full max-w-md">
@@ -30,22 +36,27 @@ function Login() {
             <p className="text-gray-500 text-sm mt-2">signin to your account</p>
           </div>
           {/* LOGIN - FORM */}
-          <form action="" onSubmit={handleSubmit} className="spcae-y-6">
+          <form
+            action=""
+            onSubmit={handleSubmit}
+            className="spcae-y-6 flex gap-6 flex-col"
+          >
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
               </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-1/2 text-gray-400">
+              <div className="relative bg-white">
+                <span className="absolute left-6 top-1/2 -translate-1/2 text-gray-400">
                   <Mail className="w-5 h-5" />
                 </span>
                 <input
                   type="email"
-                  className="w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  autoComplete="email"
+                  className={inputCss}
                   value={formData.email}
-                  onChange={(e) => {
-                    setFormData((prev) => ({ ...prev, email: e.target.value }));
-                  }}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, email: e.target.value }))
+                  }
                 />
               </div>
             </div>
@@ -54,12 +65,12 @@ function Login() {
                 Password
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-1/2 text-gray-400">
+                <span className="absolute left-6 top-1/2 -translate-1/2 text-gray-400">
                   <Lock className="w-5 h-5" />
                 </span>
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="w-full border border-gray-300 rounded-md py-2 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  className={inputCss}
                   placeholder="*******"
                   value={formData.password}
                   onChange={(e) => {
@@ -101,10 +112,23 @@ function Login() {
 
           {/* FOOTER */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500">Dont&apos;t</p>
+            <p className="text-sm text-gray-500">
+              Dont&apos;t have an account?
+            </p>
+            <Link className="text-blue-600 hover:underline" to={"/register"}>
+              Create account
+            </Link>
           </div>
         </div>
       </div>
+
+      {/* RIGHT SIDE */}
+      <AuthImagePattern
+        title={"Welcome back!"}
+        subtitle={
+          "Sign in to continue your converstion and catchup with your messages"
+        }
+      />
     </div>
   );
 }
