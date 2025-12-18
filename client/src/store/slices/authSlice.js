@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { axiosInstance } from "../../lib/axios";
 import { connectSocket, disconnetSocket } from "../../lib/socket";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 export const getUser = createAsyncThunk("user/me", async (_, thunkAPI) => {
   console.log("from get user");
 
@@ -41,6 +42,22 @@ export const login = createAsyncThunk(
       return res.data;
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to sign in");
+      return thunkAPI.rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+
+export const signUp = createAsyncThunk(
+  "user/sign-up",
+  async (data, thunkAPI) => {
+    try {
+      const res = await axiosInstance.post("/user/sign-up", data);
+      console.log({ "signup respose": res });
+      toast.success("Signed up successfully");
+
+      return res.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to sign up");
       return thunkAPI.rejectWithValue(error.response?.data?.message);
     }
   }
@@ -85,6 +102,16 @@ const authSlice = createSlice({
       })
       .addCase(login.rejected, (state) => {
         state.isLogginIn = false;
+      })
+      .addCase(signUp.pending, (state) => {
+        state.isSigninUp = true;
+      })
+      .addCase(signUp.fulfilled, (state, action) => {
+        state.isSigninUp = false;
+        state.authUser = action.payload;
+      })
+      .addCase(signUp.rejected, (state) => {
+        state.isSigninUp = false;
       });
   },
 });
