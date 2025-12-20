@@ -34,7 +34,7 @@ function ChatContainer() {
 
   useEffect(() => {
     if (!selectedUser?._id) return;
-    dispatch(selectedUser?._id);
+    dispatch(getMessages(selectedUser?._id));
 
     const socket = getSocket();
 
@@ -43,13 +43,14 @@ function ChatContainer() {
 
   if (isMessagesLoading) {
     return (
-      <div className="flex-1 flexflex-col overflow-auto">
+      <div className="flex-1 flex flex-col overflow-auto">
         <ChatHeader />
         <MessageSkeleton />
         <MessageInput />
       </div>
     );
   }
+
   return (
     <>
       <div className="flex-1 flex flx-col overflow-hidden bg-white">

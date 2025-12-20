@@ -8,7 +8,7 @@ function ChatHeader() {
   const dispatch = useDispatch();
   return (
     <>
-      <div className="p-3 border-b bg-gray-200 ring-1 rinf-gray-300">
+      <div className="p-3 border-b border-gray-200 bg-gray-200 ring-1 ring-gray-300">
         <div className="flex items-center justify-between">
           {/* USER INFO */}
           <div className="flex items-center gap-3">

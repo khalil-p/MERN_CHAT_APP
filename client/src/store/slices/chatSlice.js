@@ -19,7 +19,7 @@ export const getMessages = createAsyncThunk(
   "chat/getMessages",
   async (userId, thunkAPI) => {
     try {
-      const res = await axiosInstance.get(`/messages/${userId}`);
+      const res = await axiosInstance.get(`/message/${userId}`);
       return res.data;
     } catch (error) {
       toast.error(error.response.data.message);

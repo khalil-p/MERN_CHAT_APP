@@ -31,13 +31,10 @@ export const getMessages = catchAsyncErrors(async (req, res, next) => {
     ],
   });
 
-  return (
-    res.status(200),
-    json({
-      success: true,
-      messages,
-    })
-  );
+  return res.status(200).json({
+    success: true,
+    messages,
+  });
 });
 export const sendMessages = catchAsyncErrors(async () => {
   const { text } = req.body;
@@ -102,6 +99,6 @@ export const sendMessages = catchAsyncErrors(async () => {
 
   res.status(201).json({
     newMessage,
-    success: true, 
+    success: true,
   });
 });
