@@ -6,6 +6,7 @@ function AuthImagePattern({ title, subtitle }) {
           {[...Array(9)].map((_, i) => {
             return (
               <div
+                key={i + 1}
                 className={`aspect-square rounded-2xl bg-gray-700/30 ${
                   i % 2 === 0 ? "animate-pulse" : ""
                 }`}

@@ -20,10 +20,29 @@ export const getMessages = createAsyncThunk(
   async (userId, thunkAPI) => {
     try {
       const res = await axiosInstance.get(`/message/${userId}`);
+      console.log({ res });
+
       return res.data;
     } catch (error) {
       toast.error(error.response.data.message);
-      return thunkAPI.rejectWithValue(error.respomse.data.message);
+      return thunkAPI.rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
+export const sendMessage = createAsyncThunk(
+  "chat/sendMessage",
+  async (messageData, thunkAPI) => {
+    try {
+      const { chat } = thunkAPI.getState();
+      const res = await axiosInstance.post(
+        `/message/send/${chat.selectedUser._id}`,
+        messageData
+      );
+      return res.data.message;
+    } catch (error) {
+      toast.error(error.response.data.message);
+      return thunkAPI.rejectWithValue(error.response.data.message);
     }
   }
 );
@@ -35,6 +54,7 @@ const chatSlice = createSlice({
     selectedUser: null,
     isUsersLoading: false,
     isMessagesLoading: false,
+    isSendMessageLoading: false,
   },
   reducers: {
     setSelectedUser: (state, action) => {
@@ -61,9 +81,22 @@ const chatSlice = createSlice({
       })
       .addCase(getMessages.fulfilled, (state, action) => {
         state.messages = action.payload.messages;
+        state.isMessagesLoading = false;
       })
       .addCase(getMessages.rejected, (state) => {
         state.isMessagesLoading = false;
+      })
+      .addCase(sendMessage.pending, (state) => {
+        state.isSendMessageLoading = true;
+      })
+      .addCase(sendMessage.fulfilled, (state, action) => {
+        console.log({ messages: action.payload });
+
+        state.messages.push(action.payload);
+        state.isSendMessageLoading = false;
+      })
+      .addCase(sendMessage.rejected, (state) => {
+        state.isSendMessageLoading = false;
       });
   },
 });

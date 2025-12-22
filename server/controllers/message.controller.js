@@ -2,7 +2,7 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.middleware.js 
 import { Message } from "../models/message.model.js";
 import { User } from "../models/user.model.js";
 import { getReceiverSockerId } from "../utils/socket.js";
-
+import { io } from "../utils/socket.js";
 export const getAllUsers = catchAsyncErrors(async (req, res, next) => {
   const user = req.user;
   const filteredUsers = await User.find({ _id: { $ne: user._id } }).select(
@@ -36,9 +36,11 @@ export const getMessages = catchAsyncErrors(async (req, res, next) => {
     messages,
   });
 });
-export const sendMessages = catchAsyncErrors(async () => {
+export const sendMessages = catchAsyncErrors(async (req, res, next) => {
   const { text } = req.body;
   const media = req.files?.media;
+  console.log({ media });
+
   const { id: receiverId } = req.params;
   const senderId = req.user._id;
 
@@ -54,23 +56,16 @@ export const sendMessages = catchAsyncErrors(async () => {
   if (!sanitizedText && !media) {
     return res.status(400).json({
       success: false,
-      message: "Message cannot be empty message",
+      message: "Message cannot be empty",
     });
   }
 
   let mediaUrl = "";
 
-  const newMessage = new Message({
-    senderId,
-    receiverId,
-    text: sanitizedText,
-    media: mediaUrl,
-  });
-
   if (media) {
     try {
-      const uploadResponse = await cloudinary.uploader.uploader.upload(
-        media.text,
+      const uploadResponse = await cloudinary.uploader.upload(
+        media.tempFilePath,
         {
           resourse_type: "auto",
           folder: "CHAT_APP_MEDIA",
@@ -86,19 +81,25 @@ export const sendMessages = catchAsyncErrors(async () => {
       console.error("Cloudinary Upload Error:", error);
       return res.status(500).json({
         success: false,
-        message: "Failed to upload media. Please try again later.",
+        message: "Failed to upload media",
       });
     }
   }
 
-  const receiverSocketId = getReceiverSockerId(receiverId);
+  const newMessage = await Message.create({
+    senderId,
+    receiverId,
+    text: sanitizedText,
+    media: mediaUrl,
+  });
 
+  const receiverSocketId = getReceiverSockerId(receiverId);
   if (receiverSocketId) {
     io.to(receiverSocketId).emit("newMessage", newMessage);
   }
 
-  res.status(201).json({
-    newMessage,
+  return res.status(201).json({
+    message: newMessage,
     success: true,
   });
 });

@@ -1,9 +1,10 @@
 import { X } from "lucide-react";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { setSelectedUser } from "../store/slices/chatSlice";
 
 function ChatHeader() {
-  const { selectedUser, setSelectedUser } = useSelector((state) => state.chat);
+  const { selectedUser } = useSelector((state) => state.chat);
   const { onlineUsers } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   return (
@@ -20,7 +21,7 @@ function ChatHeader() {
                 className="w-full h-full object-cover rounded-full"
               />
               {onlineUsers.includes(selectedUser._id) && (
-                <span className="absolute  bottom-0 right-0 w-3 h-3 bg-green-500 border-whote border-2 rounded-full" />
+                <span className="absolute  bottom-0 right-0 w-3 h-3 bg-green-500 border-white border-2 rounded-full" />
               )}
             </div>
             {/* NAME AND STATUS */}

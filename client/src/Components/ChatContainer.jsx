@@ -50,17 +50,23 @@ function ChatContainer() {
       </div>
     );
   }
+  console.log({ messages });
 
   return (
     <>
-      <div className="flex-1 flex flx-col overflow-hidden bg-white">
+      <div className="flex-1 flex flex-col overflow-hidden bg-white">
         <ChatHeader />
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
           {messages.length > 0 &&
             messages.map((message, index) => {
-              const isSender = message.sender === authUser._id;
+              console.log({ message });
+
+              const isSender = message?.senderId === authUser._id;
+              console.log({ isSender });
+
               return (
                 <div
+                  key={index + 1}
                   className={`flex items-end ${
                     isSender ? "justify-end" : "justify-start"
                   }`}
@@ -68,7 +74,7 @@ function ChatContainer() {
                 >
                   {/* AVATAR */}
                   <div
-                    className={`w-10 h-10 rounded-full overflow-hidden border shrink-0 ${
+                    className={`w-10 h-10 rounded-full overflow-hidden border-none shrink-0 ${
                       isSender ? "order-2 ml-3" : "order-1 mr-3"
                     }`}
                   >
@@ -119,6 +125,7 @@ function ChatContainer() {
               );
             })}
         </div>
+        <MessageInput />
       </div>
     </>
   );

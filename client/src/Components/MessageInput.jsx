@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { Image, Send, X } from "lucide-react";
 import { getSocket } from "../lib/socket";
+import { sendMessage } from "../store/slices/chatSlice";
 function MessageInput() {
   const [text, setText] = useState("");
   const [mediaPreview, setMediaPreview] = useState(null);
@@ -15,17 +16,19 @@ function MessageInput() {
   const { selectedUser } = useSelector((state) => state.chat);
   const handleMediaChange = (e) => {
     const file = e.target.files[0];
+    console.log({ file });
+
     if (!file) return;
     setMedia(file);
     const type = file.type;
-    if (type.startWith("image/")) {
+    if (type.startsWith("image/")) {
       setMediaType("image");
       const reader = new FileReader();
       reader.onload = () => {
         setMediaPreview(reader.result);
       };
       reader.readAsDataURL(file);
-    } else if (type.startWith("video/")) {
+    } else if (type.startsWith("video/")) {
       setMediaType("video");
       const videoUrl = URL.createObjectURL(file);
       setMediaPreview(videoUrl);
@@ -46,7 +49,7 @@ function MessageInput() {
   };
 
   const handleSendMessage = async (e) => {
-    e.prevenDefault();
+    e.preventDefault();
     if (!text.trim() && !media) {
       return;
     }
@@ -54,7 +57,7 @@ function MessageInput() {
     data.append("text", text.trim());
     data.append("media", media);
 
-    // dispatch(sendMessage(data))
+    dispatch(sendMessage(data));
 
     setText("");
     setMedia(null);
@@ -77,6 +80,7 @@ function MessageInput() {
     socket.on("newMessage", handleNewMessage);
     return () => socket.off("newMessage", handleNewMessage);
   }, [selectedUser._id]);
+
   return (
     <div className="p-4 w-full">
       {mediaPreview && (
@@ -128,7 +132,7 @@ function MessageInput() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className={`hidden s,:flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 hover:border-gray-100 transition ${
+            className={`flex items-center justify-center w-10 h-10 rounded-full border border-gray-300 hover:border-gray-100 transition ${
               mediaPreview ? "text-emerald-500" : "text-gray-400"
             }`}
           >
